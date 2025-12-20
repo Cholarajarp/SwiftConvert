@@ -1,0 +1,1 @@
+export default () => <div className="p-10">Free Plan – Unlimited conversions</div>;
