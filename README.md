@@ -1,350 +1,329 @@
-
 # SwiftConvert 🚀
 
-A modern, production-ready file conversion web application built with React, Vite, Tailwind CSS, and Express.js. Convert documents, images, and spreadsheets between multiple formats effortlessly and deploy to Render or GitHub Pages.
+A modern, production-ready file conversion web application built with React, Vite, Tailwind CSS, and Python Flask. Convert documents, images, and spreadsheets between 15 file formats effortlessly with integrated Stripe payment processing.
 
-![SwiftConvert](https://img.shields.io/badge/Version-1.0.0-blue)
-![Node Version](https://img.shields.io/badge/Node-18.x-green)
-![License](https://img.shields.io/badge/License-MIT-orange)
+![SwiftConvert](https://img.shields.io/badge/Version-2.0.0-blue)
+![Python Version](https://img.shields.io/badge/Python-3.11-green)
+![Node Version](https://img.shields.io/badge/Node-20.x-green)
+![License](https://img.shields.io/badge/License-Proprietary-red)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
 ---
 
 ## 🎯 Features
 
-- ⚡ **Fast Conversions** - Lightning-speed processing using Pandoc and LibreOffice
-- 📁 **Multiple Formats** - PDF, DOCX, DOC, TXT, XLSX, CSV, PPTX, JPG, PNG
-- 🔒 **Secure & Private** - Files deleted after conversion, no server storage
+- ⚡ **Fast Conversions** - Lightning-speed processing using pdf2docx, PIL, and LibreOffice
+- 📁 **15+ Formats** - PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML, XLSX, XLS, ODS, CSV, PPTX, ODP, JPG, PNG
+- 🔒 **Secure & Private** - Files automatically deleted after 24 hours
 - 🎨 **Beautiful UI** - Modern, responsive design with Tailwind CSS
 - 🎯 **Drag & Drop** - Easy file upload interface
-- 🔍 **OCR Support** - Extract text from images and scanned documents
 - 📊 **Progress Tracking** - Real-time conversion progress display
-- 🚀 **Production Ready** - Optimized for Render and GitHub Pages deployment
+- 💳 **Stripe Integration** - Secure payment processing for Pro plan (₹49/month)
+- 🚀 **Production Ready** - Optimized Python Flask backend
+- 🌐 **Full-Stack** - React frontend + Python backend
+- 🐳 **Docker Support** - Easy deployment with Docker and Docker Compose
 
 ---
 
-## 📦 Supported Formats
+## 📦 Supported Formats (15)
 
-### Input Formats
-- **Documents**: PDF, DOCX, DOC, TXT
-- **Spreadsheets**: XLSX, CSV
-- **Presentations**: PPTX
-- **Images**: JPG, JPEG, PNG
+### Documents
+- **Input/Output**: PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML
+
+### Spreadsheets
+- **Input/Output**: XLSX, XLS, ODS, CSV
+
+### Presentations
+- **Input/Output**: PPTX, ODP
+
+### Images
+- **Input/Output**: JPG, JPEG, PNG
+
+### Popular Conversions
+✅ **PDF → DOCX** (using pdf2docx)  
+✅ **DOCX → PDF** (using LibreOffice)  
+✅ **JPG/PNG → PDF** (using Pillow)  
+✅ **Image → Image** (JPG ↔ PNG)  
+✅ **CSV → XLSX** (using pandas)  
+✅ **XLSX → CSV**  
+✅ **All document formats** (using LibreOffice)
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 14+
-- Pandoc
-- LibreOffice
+- **Python 3.11+**
+- **Node.js 20+**
+- **LibreOffice** (optional, for advanced document conversions)
+- **Docker & Docker Compose** (optional, for containerized deployment)
 
-### Install Tools (Windows)
-```bash
-# Using Chocolatey
-choco install pandoc libreoffice-fresh
-```
+### Option 1: Traditional Setup
 
-### Run Everything
 ```bash
-# Install dependencies
+# 1. Clone the repository
+git clone https://github.com/Cholarajarp/SwiftConvert.git
+cd SwiftConvert
+
+# 2. Install Python dependencies
+pip install -r requirements.txt
+
+# 3. Install Node dependencies
 npm install
 
-# Start both backend and frontend
-npm run dev:all
+# 4. Create environment file
+cp .env.example .env
+# Edit .env and add your Stripe keys
+
+# 5. Start the backend (Python Flask)
+python app.py
+
+# 6. In another terminal, start the frontend
+npm run dev
 ```
 
-Then visit: **http://localhost:5173**
+### Option 2: Docker Deployment (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Cholarajarp/SwiftConvert.git
+cd SwiftConvert
+
+# 2. Create environment file
+cp .env.example .env
+# Edit .env and add your Stripe keys
+
+# 3. Build and run with Docker Compose
+docker-compose up --build
+
+# To run in background
+docker-compose up -d
+
+# To stop
+docker-compose down
+```
+
+**Docker URLs:**
+- Frontend: **http://localhost**
+- Backend API: **http://localhost:3001**
+
+**Traditional Setup URL:**
+- Visit: **http://localhost:5173**
 
 ---
 
-## 🏗️ Architecture
+## 💳 Pricing
+
+### Free Plan
+- ✅ 5 conversions per day
+- ✅ 15 file formats
+- ✅ Up to 50MB file size
+- ✅ Basic quality
+
+### Pro Plan - ₹49/month ($0.60 USD)
+- ✅ Unlimited conversions
+- ✅ 15 file formats
+- ✅ Up to 200MB file size
+- ✅ High quality conversions
+- ✅ Batch processing
+- ✅ Priority support
+
+### Enterprise Plan - Custom
+- ✅ Custom pricing
+- ✅ API access
+- ✅ Dedicated support
+
+---
+
+## 📁 Project Structure
 
 ```
-Frontend (React + Vite)
-        ↓
-POST /api/convert (with file)
-        ↓
-Backend (Express.js) 
-        ↓
-Pandoc OR LibreOffice
-        ↓
-Converted File
-        ↓
-GET /api/download
-        ↓
-User Downloads
+SwiftConvert/
+├── app.py                   # Python Flask backend
+├── requirements.txt         # Python dependencies
+├── package.json             # Node dependencies
+├── .env.example             # Environment variables template
+├── LICENSE                  # MIT License
+├── README.md                # This file
+├── Dockerfile               # Backend Docker image
+├── Dockerfile.frontend      # Frontend Docker image
+├── docker-compose.yml       # Docker Compose configuration
+├── nginx.conf               # Nginx configuration for frontend
+├── .dockerignore            # Docker ignore file
+├── src/
+│   ├── App.jsx             # React router setup
+│   ├── SwiftConvert.jsx    # Main conversion component
+│   ├── components/
+│   │   ├── PageHeader.jsx  # Reusable header component
+│   │   ├── PricingCard.jsx # Reusable pricing card
+│   │   └── ContentSection.jsx # Reusable content section
+│   └── pages/
+│       ├── About.jsx       # About page
+│       ├── Pricing.jsx     # Pricing page (with Stripe)
+│       ├── Privacy.jsx     # Privacy policy
+│       └── Terms.jsx       # Terms of service
+├── uploads/                # Temporary upload directory
+└── converted/              # Temporary output directory
 ```
 
 ---
 
-## 📦 What's Included
+## 🔌 API Endpoints
 
-### Backend (`server.js`)
-- Express.js server on port 3001
-- Multer for file uploads (100MB limit)
-- Dual-engine conversion (Pandoc + LibreOffice)
-- RESTful API endpoints
-- Automatic file cleanup
-
-### Frontend (`src/SwiftConvert.jsx`)
-- React + Vite + Tailwind CSS
-- Drag & drop file upload
-- Real-time format selection
-- Backend health checking
-- Progress tracking
-- Download management
-
-### Supported Formats (20+)
-**Documents:** PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML
-**Spreadsheets:** XLSX, XLS, ODS, CSV
-**Presentations:** PPTX, PPT, ODP
-
----
-
-## 🎯 API Reference
+### Health Check
+```bash
+GET /api/health
+```
 
 ### Convert File
 ```bash
 POST /api/convert
 Content-Type: multipart/form-data
-
-{
-  "file": <binary>,
-  "toFormat": "pdf"
-}
-
-Response:
-{
-  "success": true,
-  "fileName": "document-abc123.pdf",
-  "downloadUrl": "/api/download/document-abc123.pdf"
-}
+Body: { file: <file>, toFormat: "docx" }
 ```
 
-### Download Converted File
+### Download File
 ```bash
-GET /api/download/document-abc123.pdf
+GET /api/download/{filename}
 ```
 
-### Check Server Health
+### Create Payment
 ```bash
-GET /api/health
-
-Response: { "status": "ok", "message": "Server is running" }
+POST /api/create-checkout-session
+Body: { "plan": "pro", "currency": "inr" }
 ```
-
-### Get Supported Formats
-```bash
-GET /api/formats
-
-Response: { "formats": ["pdf", "docx", "xlsx", ...] }
-```
-
----
-
-## 🛠️ Configuration
-
-### Change Port
-```bash
-PORT=3002 npm run server
-```
-
-### Increase File Size Limit
-Edit `server.js` line 38:
-```javascript
-limits: { fileSize: 500 * 1024 * 1024 } // 500MB
-```
-
-### Disable Auto-Delete
-Comment out lines 251-256 in `server.js`
-
----
-
-## 📝 How It Works
-
-1. **User uploads file** → Drag & drop validation
-2. **Frontend sends to backend** → POST /api/convert
-3. **Backend saves temporarily** → Multer storage
-4. **Conversion engine runs**:
-   - Tries Pandoc first (fast)
-   - Falls back to LibreOffice if needed
-5. **File stored in output folder**
-6. **Download link returned** → Frontend downloads
-7. **Auto-cleanup** → File deleted after 5 seconds
-
----
-
-## 🔒 Security
-
-- ✅ CORS validation
-- ✅ File size limits (100MB default)
-- ✅ Path traversal prevention
-- ✅ Unique file naming (UUID)
-- ✅ Automatic cleanup
-- ✅ Input validation
 
 ---
 
 ## 🚀 Deployment
 
-### Local Network
+### Docker Production Deployment
+
 ```bash
-npm run dev:all
-# Access from other machines at your-ip:5173
+# 1. Set environment variables
+cp .env.example .env
+# Edit .env with production Stripe keys
+
+# 2. Build and run
+docker-compose up -d
+
+# 3. Check logs
+docker-compose logs -f
+
+# 4. Scale if needed
+docker-compose up -d --scale backend=2
+
+# 5. Update deployment
+docker-compose pull
+docker-compose up -d --build
 ```
 
-### Production (Linux Server)
+### Render.com Deployment
+
+1. Push to GitHub
+2. Create new Web Service on Render
+3. Select **Python** runtime
+4. Build command: `pip install -r requirements.txt && npm install && npm run build`
+5. Start command: `python app.py`
+6. Add environment variables:
+   - `STRIPE_PUBLIC_KEY`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `PRO_PLAN_PRICE_INR=49`
+
+### Docker Hub (Optional)
+
 ```bash
-# Install tools
-sudo apt-get install pandoc libreoffice
+# Build images
+docker build -t swiftconvert-backend:latest -f Dockerfile .
+docker build -t swiftconvert-frontend:latest -f Dockerfile.frontend .
 
-# Install dependencies
-npm install --production
-
-# Run with PM2
-npm install -g pm2
-pm2 start server.js
-
-# For frontend, build and serve
-npm run build
-npx serve -s dist -l 3000
-```
-
-### Docker
-```dockerfile
-FROM node:18-alpine
-RUN apk add --no-cache pandoc libreoffice
-WORKDIR /app
-COPY . .
-RUN npm install --production
-EXPOSE 3001
-CMD ["node", "server.js"]
+# Tag and push
+docker tag swiftconvert-backend:latest yourusername/swiftconvert-backend:latest
+docker tag swiftconvert-frontend:latest yourusername/swiftconvert-frontend:latest
+docker push yourusername/swiftconvert-backend:latest
+docker push yourusername/swiftconvert-frontend:latest
 ```
 
 ---
 
-## ✨ Features
+## 🛠️ Development
 
-### Implemented ✅
-- Real file conversion
-- Dual-engine reliability
-- Beautiful UI
-- Drag & drop
-- Progress tracking
-- Backend monitoring
-- Format validation
-- Auto-cleanup
-- Error handling
-- Responsive design
-
-### Enterprise Ready
-- Scalable architecture
-- Async processing
-- Proper error messages
-- File logging
-- Health checks
-
----
-
-## 🐛 Troubleshooting
-
-### "Backend Offline" Error
 ```bash
-# Make sure backend is running
-npm run server
+# Traditional setup
+# Run backend
+python app.py
 
-# Check if port 3001 is free
-lsof -i :3001  # macOS/Linux
-```
-
-### Pandoc Not Found
-```bash
-# macOS
-brew install pandoc
-
-# Windows
-choco install pandoc
-
-# Linux
-sudo apt-get install pandoc
-```
-
-### LibreOffice Not Found
-```bash
-# macOS
-brew install --cask libreoffice
-
-# Windows
-choco install libreoffice-fresh
-
-# Linux
-sudo apt-get install libreoffice
-```
-
-### File Upload Fails
-- Check file size (max 100MB)
-- Check file format is supported
-- Check backend logs for errors
-
----
-
-## 📂 Project Structure
-
-```
-SwiftConvert-Vite-Scaffold/
-├── server.js              # Backend (Express)
-├── src/
-│   ├── SwiftConvert.jsx   # Frontend (React)
-│   ├── main.jsx
-│   ├── index.css
-│   └── pages/
-├── package.json           # Dependencies
-├── vite.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── uploads/               # Temp files (auto-created)
-├── converted/             # Output files (auto-created)
-├── SETUP.md               # Detailed setup
-├── BUILD_COMPLETE.md      # Build summary
-└── start.bat              # Windows launcher
-```
-
----
-
-## 🎓 This is Real Production Code
-
-Compare with these established services:
-- **iLovePDF** - Uses similar architecture
-- **CloudConvert** - Dual-engine approach
-- **Zamzar** - File processing pipeline
-- **Adobe** - Professional conversion
-
-**You now have enterprise-grade conversion!**
-
----
-
-## 📞 Support
-
-See [SETUP.md](SETUP.md) for detailed setup instructions.
-
-See [BUILD_COMPLETE.md](BUILD_COMPLETE.md) for build summary.
-
----
-
-## 📄 License
-
-MIT
-
----
-
-**Made with ❤️ | SwiftConvert Production Build 🚀**
-
-
-Minimal Vite + React + Tailwind scaffold.
-
-## Run
-npm install
+# Run frontend
 npm run dev
 
-Paste your full SwiftConvert UI into src/SwiftConvert.jsx
+# Build for production
+npm run build
+```
+
+```bash
+# Docker development
+# Run with hot reload
+docker-compose -f docker-compose.dev.yml up
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Restart services
+docker-compose restart backend
+
+# Clean up
+docker-compose down -v
+```
+
+---
+
+## 📝 License
+
+This project is licensed under a **Proprietary License** - see the [LICENSE](LICENSE) file for details.
+
+### What this means:
+✅ **Free to use** - Use the software for personal or commercial purposes at no charge  
+✅ **Access source code** - View and learn from the code  
+❌ **No copying** - Cannot copy or redistribute without permission  
+❌ **No modification** - Cannot modify and redistribute as your own  
+❌ **No commercial redistribution** - Cannot sell or distribute copies  
+⚠️ **Permission required** - Contact owner for copying, redistribution, or derivative works  
+
+**You are free to:**
+- Use the software for any purpose (personal or commercial)
+- Access the source code for learning purposes
+- Deploy your own instance for your use
+
+**You CANNOT do without permission:**
+- Copy or redistribute the software
+- Create and distribute modified versions
+- Sell or sublicense the software
+- Remove copyright notices
+
+**To request permission:**  
+Contact: ccholarajarp@gmail.com
+
+**Copyright © 2025 Cholaraja R P. All Rights Reserved.**
+
+---
+
+## 👨‍💻 Author
+
+**Cholaraja R P**
+- GitHub: [@Cholarajarp](https://github.com/Cholarajarp)
+- LinkedIn: [Cholaraja R P](https://www.linkedin.com/in/cholaraja-r-p-4128a624b)
+- Email: ccholarajarp@gmail.com
+
+---
+
+## 📊 Status
+
+✅ **Backend**: Python Flask - Fully operational  
+✅ **Frontend**: React + Vite - Fully operational  
+✅ **Conversions**: 15 formats - All working  
+✅ **Payment**: Stripe integration - Ready  
+✅ **Deployment**: Production-ready  
+
+**Built with ❤️ using Python, React, and modern web technologies**

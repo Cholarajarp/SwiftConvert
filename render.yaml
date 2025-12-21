@@ -1,16 +1,30 @@
 services:
   - type: web
-    name: swiftconvert
-    env: node
+    name: swiftconvert-python
+    runtime: python
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    routes:
-      - path: /
-        destination: /
+    buildCommand: "pip install -r requirements.txt && npm install && npm run build"
+    startCommand: "python app.py"
     envVars:
-      - key: NODE_ENV
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: FLASK_ENV
         value: production
       - key: PORT
         value: 3001
-    staticPublicPath: dist
+      - key: NODE_ENV
+        value: production
+      - key: STRIPE_PUBLIC_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PRO_PLAN_PRICE_INR
+        value: "49"
+      - key: PRO_PLAN_PRICE_USD
+        value: "0.60"
+      - key: MAX_FILE_SIZE
+        value: "104857600"

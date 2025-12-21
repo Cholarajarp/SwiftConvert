@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { FileText, X, Download, Zap, Shield, Send, Upload, AlertCircle, CheckCircle, File, Image, FileSpreadsheet, Presentation } from 'lucide-react';
 
 const API_BASE_URL = 'http://localhost:3001';
@@ -43,16 +44,23 @@ export default function SwiftConvert() {
   };
 
   const allowedFormats = {
-    'PDF': ['DOCX', 'DOC', 'TXT', 'XLSX', 'CSV', 'PPTX', 'JPG', 'PNG'],
-    'DOCX': ['PDF', 'TXT', 'DOC'],
-    'DOC': ['PDF', 'TXT', 'DOCX'],
-    'TXT': ['PDF', 'DOCX'],
-    'XLSX': ['PDF', 'CSV'],
-    'CSV': ['PDF', 'XLSX'],
-    'PPTX': ['PDF'],
-    'JPG': ['PDF', 'PNG'],
-    'PNG': ['PDF', 'JPG'],
-    'JPEG': ['PDF', 'PNG']
+    'PDF': ['DOCX', 'DOC', 'TXT', 'RTF', 'HTML'],
+    'DOCX': ['PDF', 'TXT', 'DOC', 'RTF', 'HTML', 'ODT'],
+    'DOC': ['PDF', 'TXT', 'DOCX', 'RTF', 'HTML', 'ODT'],
+    'TXT': ['PDF', 'DOCX', 'DOC', 'RTF', 'HTML'],
+    'RTF': ['PDF', 'DOCX', 'DOC', 'TXT', 'HTML'],
+    'ODT': ['PDF', 'DOCX', 'DOC', 'TXT', 'RTF', 'HTML'],
+    'HTML': ['PDF', 'DOCX', 'DOC', 'TXT', 'RTF'],
+    'MD': ['PDF', 'DOCX', 'HTML', 'TXT'],
+    'XLSX': ['PDF', 'CSV', 'XLS', 'ODS'],
+    'XLS': ['PDF', 'CSV', 'XLSX', 'ODS'],
+    'CSV': ['PDF', 'XLSX', 'XLS', 'ODS'],
+    'ODS': ['PDF', 'XLSX', 'XLS', 'CSV'],
+    'PPTX': ['PDF', 'ODP'],
+    'ODP': ['PDF', 'PPTX'],
+    'JPG': ['PDF', 'PNG', 'JPEG'],
+    'PNG': ['PDF', 'JPG', 'JPEG'],
+    'JPEG': ['PDF', 'PNG', 'JPG']
   };
 
   const getFileIcon = (format) => {
@@ -106,7 +114,7 @@ export default function SwiftConvert() {
     const format = detectFormat(selectedFile.name);
     
     if (!allowedFormats[format]) {
-      setError('Unsupported file format. Please upload PDF, DOCX, DOC, TXT, XLSX, CSV, PPTX, JPG, or PNG files.');
+      setError('Unsupported file format. Please upload PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML, XLSX, XLS, ODS, CSV, PPTX, ODP, JPG, JPEG, or PNG files.');
       return;
     }
 
@@ -289,7 +297,7 @@ export default function SwiftConvert() {
                   </p>
                   <p className="text-sm text-gray-500 mb-4">or click to browse</p>
                   <p className="text-xs text-gray-400">
-                    Supported formats: PDF, DOCX, DOC, TXT, XLSX, CSV, PPTX, JPG, PNG
+                    Supported formats: PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML, XLSX, XLS, ODS, CSV, PPTX, ODP, JPG, JPEG, PNG (15 formats)
                   </p>
                   <p className="text-xs text-gray-400 mt-1">Maximum file size: 50MB</p>
                   <input
@@ -297,7 +305,7 @@ export default function SwiftConvert() {
                     type="file"
                     onChange={handleFileChange}
                     className="hidden"
-                    accept=".pdf,.docx,.doc,.txt,.xlsx,.csv,.pptx,.jpg,.jpeg,.png"
+                    accept=".pdf,.docx,.doc,.odt,.rtf,.txt,.md,.html,.xlsx,.xls,.ods,.csv,.pptx,.odp,.jpg,.jpeg,.png"
                   />
                 </div>
               ) : (
@@ -541,6 +549,144 @@ export default function SwiftConvert() {
             </div>
           </div>
         </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="mt-32">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-gray-600">
+              Choose the plan that's right for you.<br/>
+              All plans include our core conversion features.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-8">
+            {/* Free Plan */}
+            <div className="border-2 border-gray-200 rounded-2xl p-8 bg-white hover:shadow-lg transition-shadow">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-600">/month</span>
+                </div>
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="w-full py-3 bg-white border-2 border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-50 transition-colors mb-6"
+                >
+                  Get Started
+                </button>
+                <ul className="text-left space-y-3 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>5 conversions per day</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>15 file formats supported</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Up to 50MB file size</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Basic conversion quality</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="border-2 border-indigo-600 rounded-2xl p-8 bg-gradient-to-br from-indigo-50 to-white hover:shadow-xl transition-shadow relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                Most Popular
+              </div>
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">$9.99</span>
+                  <span className="text-gray-600">/month</span>
+                </div>
+                <button 
+                  onClick={() => alert('Pro plan coming soon! Contact support@swiftconvert.com for early access.')}
+                  className="w-full py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors mb-6"
+                >
+                  Upgrade to Pro - ₹49/month
+                </button>
+                <ul className="text-left space-y-3 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Unlimited conversions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>15 file formats supported</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Up to 200MB file size</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>High quality conversions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Batch processing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Priority support</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="border-2 border-gray-200 rounded-2xl p-8 bg-white hover:shadow-lg transition-shadow">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-gray-900">Custom</span>
+                </div>
+                <button 
+                  onClick={() => window.location.href = 'mailto:support@swiftconvert.com?subject=Enterprise Plan Inquiry'}
+                  className="w-full py-3 bg-white border-2 border-gray-300 text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition-colors mb-6"
+                >
+                  Contact Sales
+                </button>
+                <ul className="text-left space-y-3 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Unlimited conversions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Custom file size limits</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>API access</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Dedicated support</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Custom integrations</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>SLA guarantee</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
@@ -555,9 +701,9 @@ export default function SwiftConvert() {
               <span className="text-xl font-semibold text-gray-700">SwiftConvert</span>
             </div>
             <div className="flex items-center gap-10">
-              <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition">About Us</a>
-              <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition">Terms of Service</a>
-              <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition">Privacy Policy</a>
+              <Link to="/about" className="text-sm text-gray-600 hover:text-gray-900 transition">About Us</Link>
+              <Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900 transition">Terms of Service</Link>
+              <Link to="/privacy" className="text-sm text-gray-600 hover:text-gray-900 transition">Privacy Policy</Link>
               <a href="mailto:support@swiftconvert.com" className="text-sm text-gray-600 hover:text-gray-900 transition">Help & Support</a>
             </div>
             <div className="flex items-center gap-4">

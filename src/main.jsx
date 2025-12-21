@@ -6,7 +6,7 @@ import App from './App'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
+  <BrowserRouter future={{ v7_startTransition: true }}>
     <App />
   </BrowserRouter>
 )

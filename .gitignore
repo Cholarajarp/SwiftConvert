@@ -3,6 +3,18 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+
 # Production
 /build
 /dist
@@ -28,8 +40,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # File conversion directories
-/uploads
-/converted
+uploads/
+converted/
+!/uploads/.gitkeep
+!/converted/.gitkeep
 
 # OS
 .DS_Store
