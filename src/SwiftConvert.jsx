@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, X, Download, Zap, Shield, Send, Upload, AlertCircle, CheckCircle, File, Image, FileSpreadsheet, Presentation } from 'lucide-react';
+import AIFeatures from './components/AIFeatures';
+import HelpSupport from './components/HelpSupport';
 
 const API_BASE_URL = 'http://localhost:3001';
 
@@ -16,6 +18,8 @@ export default function SwiftConvert() {
   const [targetFormat, setTargetFormat] = useState('PDF');
   const [error, setError] = useState('');
   const [convertedFileName, setConvertedFileName] = useState('');
+  const [dpi, setDpi] = useState(300);
+  const [ocrResult, setOcrResult] = useState(null);
   const fileInputRef = useRef(null);
 
   // Navigation handler for smooth scrolling
@@ -43,25 +47,26 @@ export default function SwiftConvert() {
     }
   };
 
+  // Restrict client-side options to only supported conversions to match backend
   const allowedFormats = {
-    'PDF': ['DOCX', 'DOC', 'TXT', 'RTF', 'HTML'],
-    'DOCX': ['PDF', 'TXT', 'DOC', 'RTF', 'HTML', 'ODT'],
-    'DOC': ['PDF', 'TXT', 'DOCX', 'RTF', 'HTML', 'ODT'],
-    'TXT': ['PDF', 'DOCX', 'DOC', 'RTF', 'HTML'],
-    'RTF': ['PDF', 'DOCX', 'DOC', 'TXT', 'HTML'],
-    'ODT': ['PDF', 'DOCX', 'DOC', 'TXT', 'RTF', 'HTML'],
-    'HTML': ['PDF', 'DOCX', 'DOC', 'TXT', 'RTF'],
-    'MD': ['PDF', 'DOCX', 'HTML', 'TXT'],
-    'XLSX': ['PDF', 'CSV', 'XLS', 'ODS'],
-    'XLS': ['PDF', 'CSV', 'XLSX', 'ODS'],
-    'CSV': ['PDF', 'XLSX', 'XLS', 'ODS'],
-    'ODS': ['PDF', 'XLSX', 'XLS', 'CSV'],
-    'PPTX': ['PDF', 'ODP'],
-    'ODP': ['PDF', 'PPTX'],
-    'JPG': ['PDF', 'PNG', 'JPEG'],
-    'PNG': ['PDF', 'JPG', 'JPEG'],
-    'JPEG': ['PDF', 'PNG', 'JPG']
-  };
+    'PDF': ['DOCX'],           // PDF -> DOCX
+    'DOCX': ['PDF', 'TXT'],    // DOCX -> PDF, DOCX -> TXT (export)
+    'DOC': ['PDF', 'DOCX'],
+    'TXT': ['PDF', 'DOCX'],
+    'MD': ['DOCX', 'PDF'],
+    'HTML': ['DOCX', 'PDF'],
+    'JPG': ['PDF'],
+    'JPEG': ['PDF'],
+    'PNG': ['PDF'],
+    'CSV': ['XLSX', 'PDF'],
+    'XLSX': ['CSV'],
+    'XLS': ['CSV'],
+    'ODS': ['XLSX'],
+    'ODT': ['DOCX', 'PDF'],
+    'RTF': ['DOCX', 'PDF'],
+    'PPTX': ['PDF'],
+    'ODP': ['PDF']
+  }; 
 
   const getFileIcon = (format) => {
     const fmt = format?.toUpperCase();
@@ -145,18 +150,27 @@ export default function SwiftConvert() {
     setIsComplete(false);
     setProgress(0);
     setError('');
+    setOcrResult(null);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('toFormat', targetFormat.toLowerCase());
 
+      // If OCR is enabled, route to the combined OCR+convert endpoint and pass DPI
+      let endpoint = `${API_BASE_URL}/api/convert`;
+      if (ocrEnabled) {
+        endpoint = `${API_BASE_URL}/api/ocr-and-convert`;
+        formData.append('dpi', dpi.toString());
+        formData.append('translate', 'false');
+      }
+
       // Simulate progress while waiting for conversion
       const progressInterval = setInterval(() => {
         setProgress(prev => Math.min(prev + Math.random() * 30, 90));
       }, 300);
 
-      const response = await fetch(`${API_BASE_URL}/api/convert`, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -173,6 +187,10 @@ export default function SwiftConvert() {
       setConvertedFileName(data.filename);
       setIsConverting(false);
       setIsComplete(true);
+
+      if (ocrEnabled) {
+        setOcrResult(data.ocr || null);
+      }
     } catch (err) {
       setError(err.message || 'Conversion failed. Please try again.');
       setIsConverting(false);
@@ -225,10 +243,11 @@ export default function SwiftConvert() {
     setOcrEnabled(false);
     setError('');
     setConvertedFileName('');
+    setOcrResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
+  }; 
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -297,7 +316,7 @@ export default function SwiftConvert() {
                   </p>
                   <p className="text-sm text-gray-500 mb-4">or click to browse</p>
                   <p className="text-xs text-gray-400">
-                    Supported formats: PDF, DOCX, DOC, ODT, RTF, TXT, MD, HTML, XLSX, XLS, ODS, CSV, PPTX, ODP, JPG, JPEG, PNG (15 formats)
+                    Supported conversions: PDF↔DOCX, Image→PDF, CSV↔XLSX, CSV→PDF, TXT/MD↔DOCX, TXT→PDF
                   </p>
                   <p className="text-xs text-gray-400 mt-1">Maximum file size: 50MB</p>
                   <input
@@ -360,24 +379,42 @@ export default function SwiftConvert() {
 
                 {/* OCR Toggle */}
                 {showOcrOption && (
-                  <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-gray-900 flex items-center gap-2">
-                        Enable OCR
-                        <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Recommended</span>
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-medium text-gray-900 flex items-center gap-2">
+                          Enable OCR
+                          <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Recommended</span>
+                        </div>
+                        <div className="text-sm text-gray-500">Extract text from images and scanned documents</div>
                       </div>
-                      <div className="text-sm text-gray-500">Extract text from images and scanned documents</div>
+                      <div className="ml-4">
+                        <button
+                          onClick={() => setOcrEnabled(!ocrEnabled)}
+                          className={`relative w-12 h-6 rounded-full transition-colors ${
+                            ocrEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                            ocrEnabled ? 'left-6' : 'left-0.5'
+                          }`} />
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => setOcrEnabled(!ocrEnabled)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        ocrEnabled ? 'bg-indigo-600' : 'bg-gray-300'
-                      }`}
-                    >
-                      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                        ocrEnabled ? 'left-6' : 'left-0.5'
-                      }`} />
-                    </button>
+
+                    {/* DPI selector shown only when OCR is enabled */}
+                    {ocrEnabled && (
+                      <div className="mt-4 flex items-center gap-4">
+                        <div className="text-sm text-gray-700">OCR Quality (DPI)</div>
+                        <select value={dpi} onChange={(e) => setDpi(parseInt(e.target.value))} className="px-3 py-2 border border-gray-300 rounded">
+                          <option value={150}>150 (fast)</option>
+                          <option value={200}>200</option>
+                          <option value={300}>300 (default)</option>
+                          <option value={400}>400 (high quality, slower)</option>
+                        </select>
+                        <div className="text-xs text-gray-500">Higher DPI improves recognition but increases processing time.</div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -414,16 +451,48 @@ export default function SwiftConvert() {
 
                 {/* Download Button */}
                 {isComplete && (
-                  <button 
-                    onClick={handleDownload}
-                    className="w-full py-4 bg-white border border-gray-300 rounded-lg text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-5 h-5" />
-                    Download Converted File
-                  </button>
+                  <>
+                    <button 
+                      onClick={handleDownload}
+                      className="w-full py-4 bg-white border border-gray-300 rounded-lg text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mb-4"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download Converted File
+                    </button>
+
+                    {/* OCR Summary */}
+                    {ocrResult && (
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700">
+                        <div className="font-medium mb-2">OCR Summary</div>
+                        <div>Confidence: {ocrResult.confidence ?? ocrResult.confidence}</div>
+                        <div>Words: {ocrResult.word_count ?? ocrResult.word_count}</div>
+                        <div>Language: {ocrResult.language ?? ocrResult.language}</div>
+                        {ocrResult.per_page && ocrResult.per_page.length > 0 && (
+                          <div className="text-xs text-gray-500 mt-2">Pages: {ocrResult.per_page.map(p => `#${p.page}:${p.words}w/${p.confidence}`).join(', ')}</div>
+                        )}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
+
+            {/* AI/ML Features Section */}
+            <div id="ai-features" className="mt-8">
+              <div className="mb-4">
+                <button onClick={() => handleNavClick('ai-features')} className="w-full text-left bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-5 rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transition">
+                  <div className="flex items-center gap-4">
+                    <Zap className="w-6 h-6" />
+                    <div>
+                      <div className="text-lg font-bold">AI / ML Features — OCR, Translate & Smart Recommendations</div>
+                      <div className="text-xs opacity-90">Quickly extract text, auto-classify documents and get output suggestions</div>
+                    </div>
+                    <div className="ml-auto text-sm bg-white/20 px-3 py-1 rounded-full">Try Now</div>
+                  </div>
+                </button>
+              </div>
+              <AIFeatures onOCRConvert={(data) => { setIsComplete(true); setConvertedFileName(data.filename); }} />
+            </div>
           </div>
 
           {/* Right Column - 3D Hand */}
@@ -568,7 +637,7 @@ export default function SwiftConvert() {
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">$0</span>
+                  <span className="text-4xl font-bold text-gray-900">₹0</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <button 
@@ -606,14 +675,14 @@ export default function SwiftConvert() {
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">$9.99</span>
+                  <span className="text-4xl font-bold text-gray-900">₹49</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <button 
                   onClick={() => alert('Pro plan coming soon! Contact support@swiftconvert.com for early access.')}
                   className="w-full py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors mb-6"
                 >
-                  Upgrade to Pro - ₹49/month
+                  Upgrade to Pro - ₹19/month
                 </button>
                 <ul className="text-left space-y-3 text-sm text-gray-600">
                   <li className="flex items-start gap-2">
@@ -736,6 +805,9 @@ export default function SwiftConvert() {
           <span className="font-semibold text-gray-900">SwiftConvert</span>
         </div>
       </div>
+
+      {/* Help & Support Floating Button */}
+      <HelpSupport />
     </div>
   );
 }
