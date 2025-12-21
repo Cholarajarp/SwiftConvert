@@ -204,12 +204,20 @@ docker-compose down
 ## 📁 Project Structure
 
 ```
-SwiftConvert/
-├── app.py                   # Python Flask backend
+SwiftConvert-Vite-Scaffold/
+├── app.py                   # Python Flask backend (main server)
+├── converters.py            # 🆕 Core conversion logic module
 ├── ml_features.py           # 🆕 AI/ML Features Module
+├── ocr_utils.py             # 🆕 OCR utilities (EasyOCR, Tesseract)
+├── fs_utils.py              # 🆕 File system utilities
 ├── requirements.txt         # Python dependencies (with AI/ML libs)
 ├── package.json             # Node dependencies
+├── vite.config.js           # Vite configuration
+├── tailwind.config.js       # Tailwind CSS configuration
+├── postcss.config.js        # PostCSS configuration
+├── index.html               # HTML entry point
 ├── .env.example             # Environment variables template
+├── .env                     # Environment variables (git-ignored)
 ├── LICENSE                  # Proprietary License
 ├── README.md                # This file
 ├── Dockerfile               # Backend Docker image
@@ -217,22 +225,36 @@ SwiftConvert/
 ├── docker-compose.yml       # Docker Compose configuration
 ├── nginx.conf               # Nginx configuration for frontend
 ├── .dockerignore            # Docker ignore file
+├── Procfile                 # 🆕 Heroku/Railway deployment config
+├── runtime.txt              # 🆕 Python runtime version
+├── render.yaml              # Render deployment configuration
+├── railway.json             # Railway deployment configuration
+├── netlify.toml             # Netlify deployment configuration
 ├── analytics.json           # 🆕 Usage analytics database
 ├── src/
+│   ├── main.jsx            # React entry point
+│   ├── index.css           # Global styles
 │   ├── App.jsx             # React router setup
 │   ├── SwiftConvert.jsx    # Main conversion component
 │   ├── components/
-│   │   ├── PageHeader.jsx  # Reusable header component
-│   │   ├── PricingCard.jsx # Reusable pricing card
+│   │   ├── PageHeader.jsx     # Reusable header component
+│   │   ├── PricingCard.jsx    # Reusable pricing card
 │   │   ├── ContentSection.jsx # Reusable content section
-│   │   └── AIFeatures.jsx  # 🆕 AI/ML Features UI
+│   │   ├── AIFeatures.jsx     # 🆕 AI/ML Features UI
+│   │   └── HelpSupport.jsx    # 🆕 Help & Support component
 │   └── pages/
 │       ├── About.jsx       # About page
 │       ├── Pricing.jsx     # Pricing page (with Stripe)
 │       ├── Privacy.jsx     # Privacy policy
 │       └── Terms.jsx       # Terms of service
-├── uploads/                # Temporary upload directory
-└── converted/              # Temporary output directory
+├── tests/                  # 🆕 Test suite
+│   ├── test_app_endpoints.py   # API endpoint tests
+│   ├── test_converters.py      # Conversion logic tests
+│   └── test_ocr_utils.py       # OCR functionality tests
+├── uploads/                # Temporary upload directory (git-ignored)
+├── converted/              # Temporary output directory (git-ignored)
+├── dist/                   # Production build output (git-ignored)
+└── __pycache__/            # Python cache (git-ignored)
 ```
 
 ---
