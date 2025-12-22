@@ -50,6 +50,9 @@ converted/
 !/uploads/.gitkeep
 !/converted/.gitkeep
 
+# Local billing DB (should not be committed)
+billing.db
+
 # OS
 .DS_Store
 Thumbs.db
