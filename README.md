@@ -2,8 +2,6 @@
 
 A modern, production-ready file conversion web application built with React, Vite, Tailwind CSS, and Python Flask. Convert documents, images, and spreadsheets between 15 file formats effortlessly with **integrated AI/ML features** including OCR, Document Classification, Smart Recommendations, and Translation.
 
-** Cloud-Optimized**: No LibreOffice dependency - deploys seamlessly to Render, Railway, AWS, and Netlify!
-
 ![SwiftConvert](https://img.shields.io/badge/Version-3.0.0--AI-blue)
 ![Python Version](https://img.shields.io/badge/Python-3.11-green)
 ![Node Version](https://img.shields.io/badge/Node-20.x-green)
