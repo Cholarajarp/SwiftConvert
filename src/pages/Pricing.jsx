@@ -8,10 +8,19 @@ export default function Pricing() {
   const handleProUpgrade = async () => {
     try {
       setLoading(true);
+
+      // Ask user for an email to associate with the subscription (used to activate Pro access)
+      const email = window.prompt('Enter the email address you want to use for Pro (you will receive receipts):');
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        alert('Please enter a valid email address.');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('http://localhost:3001/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: 'pro', currency: 'inr' })
+        body: JSON.stringify({ plan: 'pro', currency: 'inr', email })
       });
       
       const data = await response.json();
