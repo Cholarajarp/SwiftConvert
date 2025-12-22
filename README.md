@@ -350,7 +350,7 @@ Local testing & webhooks:
   - `scripts/setup_stripe_webhook.sh` — runs `stripe listen --forward-to localhost:3001/api/webhook` and helps you capture the webhook secret.
 
 Stripe & Azure App Service notes (production):
-- Create products/prices in Stripe (or use the dashboard), note the price IDs for the Pro plan.
+- Create products/prices in Stripe (or use the dashboard), note the price IDs for the Pro plan. (You can use `scripts/create_stripe_product.sh` to create sample prices via the Stripe CLI.)
 - Set the following App Settings / Secrets in the Web App (Portal or `az` CLI):
   - `STRIPE_PUBLIC_KEY`
   - `STRIPE_SECRET_KEY`
@@ -360,7 +360,17 @@ Stripe & Azure App Service notes (production):
 Set App Service settings using Azure CLI example:
 ```bash
 az webapp config appsettings set -g rg-swiftconvert -n swconvert-backend --settings \
-  STRIPE_PUBLIC_KEY="pk_live_..." STRIPE_SECRET_KEY="sk_live_..." STRIPE_WEBHOOK_SECRET="whsec_..." DATABASE_URL="postgresql://..."
+  STRIPE_PUBLIC_KEY="pk_live_..." STRIPE_SECRET_KEY="sk_live_..." STRIPE_WEBHOOK_SECRET="whsec_..." DATABASE_URL="postgresql://<user>:<pass>@<host>:5432/<db>"
+```
+
+Set GitHub repository secrets for CI usage (optional but recommended). Example using GitHub CLI:
+```bash
+export STRIPE_SECRET_KEY="sk_live_..."
+export STRIPE_PUBLIC_KEY="pk_live_..."
+export STRIPE_WEBHOOK_SECRET="whsec_..."
+export AZURE_WEBAPP_PUBLISH_PROFILE="<publish-profile-xml>"
+# Then run
+./scripts/set_github_secrets.sh
 ```
 
 Security:
