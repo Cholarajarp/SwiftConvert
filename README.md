@@ -331,7 +331,7 @@ Body: { "plan": "pro", "currency": "inr", "email": "user@example.com" }
 
 Notes:
 - The `email` field is optional but recommended. When provided, it is associated with the Stripe Checkout session and is used to activate the Pro plan for the provided email address via webhook processing.
-- On successful payment, Stripe will send a `checkout.session.completed` webhook to `/api/webhook`. The server records the subscription in a local SQLite database (`billing.db`) and provides a query endpoint to check subscription status.
+- On successful payment, Stripe will send a `checkout.session.completed` webhook to `/api/webhook`. The server records the subscription in the database (SQLite locally or Postgres when `DATABASE_URL` is set) and provides a query endpoint to check subscription status.
 
 #### Check subscription status
 ```bash
@@ -346,7 +346,29 @@ Local testing & webhooks:
 - Use the Stripe CLI to forward webhooks to your local server during development:
   - `stripe login`
   - `stripe listen --forward-to localhost:3001/api/webhook`
-- Set `STRIPE_WEBHOOK_SECRET` in your environment (or in the portal for production) and add it to your deployment secrets so the webhook signature can be validated. (See `app.py` for webhook handling.)
+- The `stripe listen` CLI prints a webhook signing secret in the output. Copy it and add it to your local `.env` as `STRIPE_WEBHOOK_SECRET` and to production secrets.
+- Example scripts:
+  - `scripts/create_stripe_product.sh` — creates a product and recurring monthly prices (INR and USD) via the Stripe CLI (requires `jq`).
+  - `scripts/setup_stripe_webhook.sh` — runs `stripe listen --forward-to localhost:3001/api/webhook` and helps you capture the webhook secret.
+
+Stripe & Azure App Service notes (production):
+- Create products/prices in Stripe (or use the dashboard), note the price IDs for the Pro plan.
+- Set the following App Settings / Secrets in the Web App (Portal or `az` CLI):
+  - `STRIPE_PUBLIC_KEY`
+  - `STRIPE_SECRET_KEY`
+  - `STRIPE_WEBHOOK_SECRET`
+  - `DATABASE_URL` (if using Azure Database for PostgreSQL)
+
+Set App Service settings using Azure CLI example:
+```bash
+az webapp config appsettings set -g rg-swiftconvert -n swconvert-backend --settings \
+  STRIPE_PUBLIC_KEY="pk_live_..." STRIPE_SECRET_KEY="sk_live_..." STRIPE_WEBHOOK_SECRET="whsec_..." DATABASE_URL="postgresql://..."
+```
+
+Security:
+- Never commit your Stripe secret key or webhook secret. Use GitHub Actions secrets and App Service settings.
+- For extra security, use Key Vault + Managed Identity to avoid storing long-lived secrets in App Settings.
+
 
 ###  AI/ML Endpoints (NEW!)
 
