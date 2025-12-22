@@ -136,6 +136,14 @@ STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', '')
 PRO_PLAN_PRICE_INR = int(os.environ.get('PRO_PLAN_PRICE_INR', 49))
 PRO_PLAN_PRICE_USD = float(os.environ.get('PRO_PLAN_PRICE_USD', 9.99))
 
+# Billing persistence (simple SQLite)
+try:
+    import billing
+    billing.init_db()
+    logger.info("Billing DB initialized at %s", billing.DB_PATH)
+except Exception as e:
+    logger.warning("Billing module not available: %s", e)
+
 # Create directories
 UPLOAD_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -214,18 +222,47 @@ def get_config():
     })
 
 
+@app.route('/api/subscription-status', methods=['GET'])
+def subscription_status():
+    """Get subscription status for a given email. Query: /api/subscription-status?email=foo@bar.com"""
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'error': 'email query parameter is required'}), 400
+    try:
+        import billing
+        rec = billing.get_subscription(email)
+        if not rec:
+            return jsonify({'active': False, 'message': 'No subscription found for that email'}), 200
+        # Return friendly fields
+        return jsonify({
+            'email': rec['email'],
+            'status': rec['status'],
+            'current_period_end': rec['current_period_end'],
+            'active': billing.is_active(email)
+        })
+    except Exception as e:
+        logger.error("Subscription status lookup failed: %s", e)
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
 @app.route('/api/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     """Create Stripe checkout session for Pro plan"""
     try:
         data = request.get_json()
         currency = data.get('currency', 'inr').lower()
+        customer_email = data.get('email')
 
         # Determine price based on currency
         if currency == 'inr':
             price_amount = PRO_PLAN_PRICE_INR * 100  # Stripe uses smallest currency unit
         else:
             price_amount = int(PRO_PLAN_PRICE_USD * 100)
+
+        # Metadata helps us map Stripe events to a local user identifier
+        metadata = {}
+        if customer_email:
+            metadata['user_email'] = customer_email
 
         # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
@@ -244,6 +281,8 @@ def create_checkout_session():
             mode='subscription',
             success_url=request.host_url + '?success=true',
             cancel_url=request.host_url + '?canceled=true',
+            customer_email=customer_email,
+            metadata=metadata
         )
 
         return jsonify({
@@ -278,7 +317,37 @@ def stripe_webhook():
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         logger.info("Payment successful for session: %s", session.get('id'))
-        # TODO: Grant Pro access to user
+
+        # Try to determine user email from session metadata or customer details
+        email = None
+        try:
+            email = session.get('metadata', {}).get('user_email') or session.get('customer_details', {}).get('email')
+        except Exception:
+            email = None
+
+        subscription_id = session.get('subscription')  # Stripe Subscription ID
+        customer_id = session.get('customer')
+
+        if subscription_id:
+            try:
+                sub = stripe.Subscription.retrieve(subscription_id)
+                status = sub.get('status')
+                current_period_end = sub.get('current_period_end') or 0
+
+                if email:
+                    try:
+                        import billing
+                        billing.upsert_subscription(email, customer_id, subscription_id, status, int(current_period_end))
+                        logger.info("Subscription recorded for %s: %s (status=%s)", email, subscription_id, status)
+                    except Exception as e:
+                        logger.error("Failed to record subscription: %s", e)
+                else:
+                    logger.warning("Subscription completed but no email available in session; subscription_id=%s", subscription_id)
+
+            except Exception as e:
+                logger.error("Failed to fetch subscription from Stripe: %s", e)
+        else:
+            logger.warning("checkout.session.completed received without subscription id: %s", session.get('id'))
 
     return jsonify({'status': 'success'})
 
