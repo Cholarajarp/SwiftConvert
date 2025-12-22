@@ -101,9 +101,11 @@ def upsert_subscription(email: str, stripe_customer_id: str, stripe_subscription
 
 def get_subscription(email: str) -> Optional[Dict[str, Any]]:
     if USE_POSTGRES:
+        import psycopg2
+        import psycopg2.extras
         conn = _get_conn_postgres()
         try:
-            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:  # type: ignore[name-defined]
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:  # type: ignore[name-defined]
                 cur.execute('SELECT * FROM subscriptions WHERE email = %s', (email,))
                 row = cur.fetchone()
                 if not row:
