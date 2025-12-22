@@ -184,7 +184,7 @@ docker-compose down
 -  Up to 50MB file size
 -  Basic quality
 
-### Pro Plan - ₹49/month ($0.60 USD)
+### Pro Plan - ₹19/month 
 -  Unlimited conversions
 -  15 file formats
 -  Up to 200MB file size
