@@ -83,7 +83,7 @@ A modern, production-ready file conversion web application built with React, Vit
   - **Permission errors on Windows:** Close the file in other apps before converting — the server retries deletions automatically when safe.
   - **ML features unavailable (503):** Ensure you ran the server inside your project virtualenv with ML packages installed (see Quick Start). The app still supports non-ML conversions without EasyOCR installed.
 
-## 📦 Supported Formats (14)
+## 📦 Supported Formats (10+)
 
 ### Documents
 - **Input/Output**: PDF, DOCX, DOC, ODT, RTF, TXT, MD
@@ -639,7 +639,7 @@ Contact: ccholarajarp@gmail.com
 
  **Backend**: Python Flask - Fully operational  
  **Frontend**: React + Vite - Fully operational  
- **Conversions**: 15 formats - All working  
+ **Conversions**: 10 formats - All working  
  **Payment**: Stripe integration - Ready  
  **Deployment**: Production-ready  
  **Docker**: Container support enabled  
