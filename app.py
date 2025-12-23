@@ -31,6 +31,8 @@ from fs_utils import safe_unlink, _save_uploaded_file, _check_file_size as fs_ch
 # Load environment variables
 load_dotenv()
 
+NODE_ENV = os.environ.get('NODE_ENV', 'production')
+
 # Configure logging first
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -853,23 +855,16 @@ if NODE_ENV == 'production':
             return send_file(str(dist_dir / path))
         return send_file(str(dist_dir / 'index.html'))
 
-# Run server
-
-PORT = int(os.environ.get("PORT", 8000))
 
 # Run server
 if __name__ == '__main__':
-    logger.info(
-        f"SwiftConvert Python Backend running on http://0.0.0.0:{PORT}"
-    )
-    logger.info(f"Upload directory: {UPLOAD_DIR}")
-    logger.info(f"Output directory: {OUTPUT_DIR}")
+    logger.info(f"SwiftConvert running on port {PORT}")
     logger.info(f"Environment: {NODE_ENV}")
-    logger.info("Supporting 15 file formats")
 
     app.run(
         host='0.0.0.0',
         port=PORT,
-        debug=(NODE_ENV == 'development')
+        debug=False
     )
+
 
