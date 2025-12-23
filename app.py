@@ -854,9 +854,14 @@ if NODE_ENV == 'production':
         return send_file(str(dist_dir / 'index.html'))
 
 # Run server
+
+PORT = int(os.environ.get("PORT", 8000))
+
+# Run server
 if __name__ == '__main__':
     logger.info(
-        f"SwiftConvert Python Backend running on http://localhost:{PORT}")
+        f"SwiftConvert Python Backend running on http://0.0.0.0:{PORT}"
+    )
     logger.info(f"Upload directory: {UPLOAD_DIR}")
     logger.info(f"Output directory: {OUTPUT_DIR}")
     logger.info(f"Environment: {NODE_ENV}")
@@ -867,3 +872,4 @@ if __name__ == '__main__':
         port=PORT,
         debug=(NODE_ENV == 'development')
     )
+
