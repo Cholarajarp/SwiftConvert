@@ -752,3 +752,8 @@ Contact: ccholarajarp@gmail.com
 - Input validation on all AI/ML endpoints
 
 **Built with ❤️ using Python, React, and AI/ML technologies**
+<<<<<<< Updated upstream
+=======
+
+C:/Users/cchol/Downloads/SwiftConvert-Vite-Scaffold/.venv/Scripts/python.exe app.py
+>>>>>>> Stashed changes

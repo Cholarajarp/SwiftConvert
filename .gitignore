@@ -22,7 +22,7 @@ ENV/
 
 # Production
 /build
-/dist
+#/dist
 
 # Environment variables
 .env

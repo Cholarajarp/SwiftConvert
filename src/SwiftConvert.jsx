@@ -675,7 +675,7 @@ export default function SwiftConvert() {
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">₹49</span>
+                  <span className="text-4xl font-bold text-gray-900">₹19</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <button 

@@ -1,4 +1,3 @@
-"""Filesystem helper utilities extracted from app.py to reduce its cohesion and complexity."""
 from pathlib import Path
 import time
 import logging

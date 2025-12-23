@@ -10,7 +10,16 @@ and provides small helpers used by the Flask app.
 from pathlib import Path
 import logging
 
-from ml_features import extract_text_ocr
+
+def _get_ml_extract_text_ocr():
+    """Lazy import of optional extract_text_ocr from ml_features with fallback."""
+    try:
+        from ml_features import extract_text_ocr
+        return extract_text_ocr
+    except Exception:
+        def _dummy(path, engine='easyocr'):
+            return {'text': '', 'confidence': 0.0, 'language': 'unknown', 'word_count': 0, 'blocks': []}
+        return _dummy
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +67,8 @@ def _create_document_from_text(text: str, output_path: Path, format_type: str):
 
 def _process_pdf_page(tmp_img: Path):
     """Run OCR on a single page image and return (text, confidence, words)."""
-    res = extract_text_ocr(tmp_img, engine='easyocr')
+    extractor = _get_ml_extract_text_ocr()
+    res = extractor(tmp_img, engine='easyocr')
     text = res.get('text', '')
     conf = float(res.get('confidence', 0.0) or 0.0)
     words = len(text.split()) if text else 0
@@ -142,11 +152,13 @@ def _extract_text_for_ocr(input_path: Path, source_ext: str, dpi: int = 300):
         return text, ocr_result
 
     logger.info("Running image OCR on: %s", input_path)
-    res = extract_text_ocr(input_path, engine='easyocr')
+    extractor = _get_ml_extract_text_ocr()
+    res = extractor(input_path, engine='easyocr')
     text = res.get('text', '')
     conf = float(res.get('confidence', 0.0) or 0.0)
     ocr_result = {
-        'text': text, 'confidence': round(
-            conf, 3), 'word_count': len(
-            text.split())}
+        'text': text,
+        'confidence': round(conf, 3),
+        'word_count': len(text.split())
+    }
     return text, ocr_result
